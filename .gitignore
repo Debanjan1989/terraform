@@ -1,0 +1,7 @@
+# Ignore dbt artifacts and Terraform state
+dbt_packages/
+target/
+*.json
+*.key
+*.tfstate*
+.terraform/
