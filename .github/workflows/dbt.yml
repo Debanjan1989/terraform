@@ -1,0 +1,39 @@
+name: dbt Run
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  dbt-job:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    env:
+      GOOGLE_WORKLOAD_IDENTITY_PROVIDER: "projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+      GOOGLE_SERVICE_ACCOUNT: "dbt-ci-sa@your-gcp-project-id.iam.gserviceaccount.com"
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install dbt-bigquery
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ env.GOOGLE_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.GOOGLE_SERVICE_ACCOUNT }}
+
+      - name: Run dbt
+        run: |
+          dbt deps
+          dbt run --profiles-dir .
