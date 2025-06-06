@@ -4,7 +4,7 @@ dbt_project:
     prod:
       type: bigquery
       method: oauth
-      project: your-gcp-project-id
+      project: caramel-spot-459922-m3
       dataset: dbt_prod
       threads: 4
       timeout_seconds: 300
